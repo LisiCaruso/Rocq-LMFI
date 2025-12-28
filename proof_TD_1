@@ -1,0 +1,219 @@
+  Check 0.
+  Check S.
+  Check nat.
+  Print nat.
+  Search nat.
+  Check 2 + 2 = 5.
+  Check forall x, exists y, x = 2 * y \/ x = 2 * y + 1.
+  Definition id := fun (A : Set) (x : A) => x.
+  Check id.
+  Check id nat 7.
+
+Parameters A B C : Prop.
+
+Lemma and_commut :
+  forall A B : Prop, A /\ B <-> B /\ A.
+Proof.
+ intros. split.
+ - intros. destruct H. split. assumption. assumption.
+ - intros. destruct H. split; assumption.
+Qed.
+
+
+Lemma E1F1 : A -> A.
+Proof.
+  intro A.
+  apply A.
+Qed.  
+
+Lemma E1F2 : (A -> B) -> (B -> C) -> A -> C.
+Proof.
+  intro f.
+  intro g.
+  intro a.
+  apply g.
+  apply f.
+  apply a.
+Qed.
+
+(* absert (h':B) 
+    { ............
+    }
+
+    to do a subproof of a lemma
+
+    tactic ; tactic' 
+      --->>> runs tactic and on the subgoals obtained run the tactic'
+
+    try -------
+    
+
+    tactic ; [ tactic4subgoal1 | tactic4subgoal2 | ...]
+
+*)
+
+Lemma E1F3 : A /\ B <-> B /\ A.
+Proof.
+  intros.
+  split.
+  - intro AB.
+    destruct AB as (a, b).
+    split.
+    apply b.
+    apply a.
+  - intro BA.
+    destruct BA.
+    rename H0 into a.
+    rename H into b.
+    split.
+    apply a.
+    apply b.
+Qed.
+
+Lemma E1F4 : A \/ B <-> B \/ A.
+Proof.
+  split.
+  - intro AoB. 
+    destruct AoB as [a | b]. (*destruct AoB.*)
+    right. apply a.
+    left. apply b.
+  - intro BoA.
+    destruct BoA as [b | a].
+    right. apply b.
+    left. apply a.
+Qed.
+    
+Lemma E1F5 : (A /\ B) /\ C <-> A /\ (B /\ C).
+Proof.
+  split.
+  - intro ABC.
+    destruct ABC as (AB, c).
+    destruct AB as (a, b).
+    split.
+    + apply a. 
+    + split.
+      * apply b.
+      * apply c.
+  - intro ABC.
+    destruct ABC as (a, BC).
+    destruct BC as (b, c).
+    split. split. apply a. apply b. apply c.
+Qed. 
+
+Lemma E1F6 : (A \/ B) \/ C <-> A \/ (B \/ C).
+Proof. 
+  split.
+   -intros AoBoC.
+    destruct AoBoC as [AoB | c].
+    destruct AoB as [a | b].
+    left. apply a.
+    right. left. apply b.
+    right. right. apply c.
+   -intros AoBoC.
+    destruct AoBoC as [a|BoC].
+    * left. left. apply a.
+    * destruct BoC as [b|c].
+      left. right. apply b.
+      right. apply c.
+Qed.
+
+Lemma E1F7 : A -> ~~A. (* A -> ((A-> false)->false) *)
+Proof. 
+  intros a.
+  intros f.
+  apply f. apply a.
+Qed.
+
+Lemma E1F8 : (A -> B) -> ~B -> ~A.
+            (* (A -> B) -> [(B -> false) -> (A -> false)] *)
+Proof. 
+  intros f.
+  intro negB.
+  intro a.
+  apply negB. apply f. apply a.
+Qed.
+
+Lemma E1F9 : ~~(A \/ ~A).
+(*              [(A \/ ~A)-> false ] -> false *)
+Proof.
+  intros H.
+  apply H.
+  right. intro a. apply H. left. apply a.
+Qed.
+
+Parameter X Y : Set.
+Parameter P Q : X -> Prop.
+Parameter R : X -> Y -> Prop.
+
+Lemma E2F1 : (forall x, P x /\ Q x) <-> (forall x, P x) /\ (forall x, Q x).
+  split.
+  * intro. 
+    split;  intro x; destruct (H x) as (px, qx); [apply px | apply qx].
+
+
+      (* this goal can be rewritten as 
+         split.
+        - intro x. 
+          destruct (H x) as (px, qx).  
+          apply px.
+        - intro x.
+          destruct (H x) as (px, qx).
+          apply qx.
+          *)
+  * intro. intro x. 
+    split ; destruct H as (Hp, Hq) ; [apply (Hp x) | apply (Hq x)].
+    (*- destruct H as (Hp, Hq).
+      apply (Hp x).
+    - apply (Hq x).
+    *)
+Qed.
+
+Lemma E2F2 : (exists x, P x \/ Q x) <-> (exists x, P x) \/ (exists x, Q x).
+Proof.
+  split.
+  - intro H.
+    destruct H as (t, H1).
+    destruct H1 as [Pt | Qt].
+      + left. exists t. apply Pt.
+      + right. exists t. apply Qt.
+  - intro H.
+    destruct H as [ExP | ExQ].
+    * destruct ExP as (t, Pt). 
+      exists t.
+      left.
+      apply Pt.
+    * destruct ExQ as (t, Qt).
+      exists t.
+      right.
+      apply Qt.
+Qed.
+
+
+Lemma E2F3 : (exists y, forall x, R x y) -> forall x, exists y, R x y.
+Proof.
+  intro H.
+  intro x.
+  destruct H as (y, allxRxy).
+  exists y.
+  apply allxRxy.
+Qed.
+
+Require Import Classical.
+
+Print classic.
+
+Lemma DoubleNegElim: forall A, (~~A) -> A.
+Proof. 
+  intro A.
+  intro nnA.
+  destruct (classic A). apply H. 
+  destruct nnA. apply H.
+Qed.
+
+Axiom not_not_elim : forall A : Prop, ~~A -> A.
+
+
+
+
+
+

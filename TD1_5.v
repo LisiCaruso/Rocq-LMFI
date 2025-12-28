@@ -1,0 +1,79 @@
+(*Define the following functions on nat (without using the ones of Coq standard library):
+
+addition
+multiplication
+subtraction
+factorial
+power
+gcd *)
+
+Fixpoint even (n:nat) : bool :=
+match n with
+| O => true
+| S O => false
+| S (S n') => even n'
+end.
+
+Fixpoint mysum (n m: nat): nat :=
+match n with 
+| 0 => m
+| S n' => S (mysum n' m)
+end.
+
+Compute mysum 3 4.
+Compute mysum 10 344.
+
+Fixpoint myproduct (n m: nat):nat :=
+match n with
+| 0 => 0
+| S n' => mysum m (myproduct n' m)
+end.
+
+Compute myproduct 13 2.
+Compute myproduct 4 7.
+
+Definition mypred (n: nat):nat :=
+match n with 
+| 0 => 0
+| S m => m
+end.
+
+Fixpoint subtraction (n m: nat):nat :=
+match m with 
+| 0 => n
+| S m' => mypred (subtraction n m')
+end.
+
+Compute mypred 10.
+Compute mypred 0.
+Compute subtraction 130 20.
+
+Fixpoint factorial (n: nat):nat :=
+match n with
+| 0 => 1
+| S m => myproduct n (factorial m)
+end.
+
+Compute factorial 2.
+Compute factorial 5.
+
+Fixpoint power (n m: nat):nat :=
+match m with 
+| 0 => 1
+| S m' => myproduct n (power n m')
+end.
+
+Compute power 2 3.
+Compute power 1 10.
+Compute power 2 10.
+
+Fixpoint gcd 
+
+def gcd_recursive(a, b):
+    if b == 0:
+        return a
+    return gcd_recursive(b, a % b)
+
+num1 = 60
+num2 = 48
+print(f"The GCD of {num1} and {num2} using Recursion is: {gcd_recursive(num1, num2)}")

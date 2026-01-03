@@ -31,7 +31,7 @@ Lemma inject_tail {A}: forall (x x': A) (l l': list A),
   x::l = x'::l' -> l = l'.
 Proof.
   intros.
-  change (my_list_tail (x::l) = my_list_tail (x'::l')).
+  change (list_tail (x::l) = list_tail (x'::l')).
   rewrite H.
   reflexivity.
 Qed.

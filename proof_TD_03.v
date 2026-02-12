@@ -3,7 +3,7 @@
 *)
 
 Require Import List Nat Arith.
-
+Require Import List Arith.
 Import ListNotations.
 
 Definition list_head {A} (l: list A) (default: A) :=
@@ -325,7 +325,6 @@ Proof.
   apply split_equiv_aux.
 Qed.
 
-
 Lemma split_contains {A} (l:list A) :
  let (l1,l2) := split l in
  forall x, In x l <-> In x l1 \/ In x l2.
@@ -334,11 +333,28 @@ Proof.
   * split.
     + intro.  left. apply H. 
     + intros [b | d]. apply b.  apply d.
-  * simpl. destruct (split (a:: l)) as (l1, l2). 
-
+  * simpl. destruct (split l) as (l1, l2). intros. split.
+    + rewrite IHl. simpl. intuition.
+    + rewrite IHl. simpl. intuition. 
     
 Qed. 
  
+Lemma split_length {A} (l:list A) :
+ let (l1,l2) := split l in
+ length l1 = length l2 \/ length l1 = S (length l2).
+Proof.
+ induction l.
+ - simpl; auto.
+ - simpl. destruct (split l) as (l1,l2). simpl.
+   destruct IHl.
+   + right. now f_equal.
+   + now left.
+Qed.
+
+
+
+
+
 
 Definition discr (m : nat) : Prop :=
  match m with
@@ -379,4 +395,27 @@ Proof.
  rewrite H. constructor.
 Qed.
 
+
+Lemma split_length_add {A} (l:list A) :
+ let (l1,l2) := split l in
+ length l = length l1 + length l2.
+Proof.
+  induction l.
+  + simpl. auto.
+  + simpl. destruct (split l) as (l1, l2).
+    simpl. f_equal.  rewrite IHl. apply Nat.add_comm.
+Qed.
+
+Lemma split_div2 {A} (l:list A) :
+ let (l1,l2) := split l in
+ length l1 = (S (length l))/2 /\ length l2 = (length l) / 2.
+Proof.
+  rewrite <- !Nat.div2_div.
+  induction l.
+  + simpl. auto.
+  + simpl. destruct (split l) as (l1, l2).
+    split.
+    * destruct IHl. simpl. f_equal. apply H0.
+    * destruct IHl. apply H. 
+Qed.
 
